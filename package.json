@@ -26,5 +26,9 @@
   "bugs": {
     "url": "https://github.com/gawati/gawati-workflow/issues"
   },
-  "homepage": "https://github.com/gawati/gawati-workflow#readme"
+  "homepage": "https://github.com/gawati/gawati-workflow#readme",
+  "dependencies": {
+    "xml2json": "^0.11.0",
+    "yargs": "^11.0.0"
+  }
 }
