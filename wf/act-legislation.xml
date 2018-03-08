@@ -1,0 +1,87 @@
+<workflow doctype="act" subtype="legislation">
+    
+    <!-- this is a model workflow, the JSON wf is exported out of this --> 
+    <!-- this is in XML to make it easier to document, since XML accepts comments, and we can also generate diagrams --> 
+    
+    <permissions>
+        <permission name="view" title="View" icon="fa-eye"/>
+        <permission name="edit" title="Edit" icon="fa-pencil"/>
+        <permission name="delete" title="Delete" icon="fa-trash-o"/>
+        <permission name="list" title="List" icon="fa-flag"/>
+        <permission name="transit" title="Transit" icon="fa-flag"/>
+    </permissions>
+    
+    <states>
+        <state name="draft" title="Draft" level="1" color="initial">
+            <permission name="view" roles="admin submitter" />
+            <permission name="list" roles="admin submitter" />
+            <permission name="edit" roles="admin submitter" />
+            <permission name="delete" roles="admin submitter"/>
+            <permission name="transit" roles="admin submitter"/>
+        </state>
+
+        <state name="editable" title="Editable" level="2" color="initial">
+            <permission name="view" roles="admin editor"/>
+            <permission name="list" roles="admin editor submitter" />
+            <permission name="delete" roles="admin editor"/>
+            <permission name="edit" roles="admin editor"/>
+            <permission name="transit" roles="admin editor"/>
+        </state>
+        
+        <state name="available_for_review" title="Ready for Review" level="3"
+            color="initial">
+            <permission name="view" roles="admin editor reviewer"/>
+            <permission name="list" roles="admin editor reviewer" />
+            <permisssion name="transit" roles="admin reviewer" />
+        </state>
+        
+        <state name="review" title="Under Review" level="3"
+            color="initial">
+            <permission name="view" roles="admin editor reviewer"/>
+            <permission name="list" roles="admin editor reviewer" />
+            <permisssion name="edit" roles="admin reviewer" />
+            <permisssion name="transit" roles="admin reviewer" />
+        </state>
+        
+        <state name="available_for_publication" title="Ready for Publication" level="4" color="middle">
+            <permission name="view" roles="admin editor reviewer publisher"/>
+            <permission name="list" roles="admin editor reviewer publisher" />
+            <permisssion name="transit" roles="admin publisher" />
+        </state>
+        
+        <state name="publish"  title="REP available for Draft Report"
+            level="5" color="final">
+            <permission name="view" roles="admin public"/>
+            <permission name="list" roles="admin publisher" />
+            <permission name="transit" roles="admin publisher"/>
+        </state>
+        
+    </states>
+    
+    <transitions>
+        
+        <!-- 
+            we could derive the transition roles based on the `transit` 
+            permissions in the @from state, you can set roles here to override the 
+            transit permissions for a specific transition
+        --> 
+        <transition name="make_editable" icon="fa-thumbs-up" title="Send for Editing"
+            from="draft" to="editable" />
+
+        <transition name="make_drafting" icon="fa-thumbs-up" title="Back to Drafting"
+            from="editable" to="draft" />
+
+        <transition name="send_for_review" icon="fa-check" title="Send for Review" 
+            from="editable" to="available_for_review" />
+        
+        <transition name="accept_for_review" icon="fa-building" title="Accept for Review" 
+            from="available_for_review" to="review" />
+
+        <transition name="send_for_publication" icon="fa-building" title="Send for Publication" 
+            from="review" to="available_for_publication" />
+        
+        <transition name="make_publish" icon="fa-building" title="Publish" 
+            from="available_for_publication" to="publish" />
+
+    </transitions>
+</workflow>

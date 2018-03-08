@@ -1,0 +1,219 @@
+{"workflow": {
+    "doctype": "act",
+    "subtype": "legislation",
+    "permissions": {"permission": [
+        {
+            "name": "view",
+            "title": "View",
+            "icon": "fa-eye"
+        },
+        {
+            "name": "edit",
+            "title": "Edit",
+            "icon": "fa-pencil"
+        },
+        {
+            "name": "delete",
+            "title": "Delete",
+            "icon": "fa-trash-o"
+        },
+        {
+            "name": "list",
+            "title": "List",
+            "icon": "fa-flag"
+        },
+        {
+            "name": "transit",
+            "title": "Transit",
+            "icon": "fa-flag"
+        }
+    ]},
+    "states": {"state": [
+        {
+            "name": "draft",
+            "title": "Draft",
+            "level": 1,
+            "color": "initial",
+            "permission": [
+                {
+                    "name": "view",
+                    "roles": "admin submitter"
+                },
+                {
+                    "name": "list",
+                    "roles": "admin submitter"
+                },
+                {
+                    "name": "edit",
+                    "roles": "admin submitter"
+                },
+                {
+                    "name": "delete",
+                    "roles": "admin submitter"
+                },
+                {
+                    "name": "transit",
+                    "roles": "admin submitter"
+                }
+            ]
+        },
+        {
+            "name": "editable",
+            "title": "Editable",
+            "level": 2,
+            "color": "initial",
+            "permission": [
+                {
+                    "name": "view",
+                    "roles": "admin editor"
+                },
+                {
+                    "name": "list",
+                    "roles": "admin editor submitter"
+                },
+                {
+                    "name": "delete",
+                    "roles": "admin editor"
+                },
+                {
+                    "name": "edit",
+                    "roles": "admin editor"
+                },
+                {
+                    "name": "transit",
+                    "roles": "admin editor"
+                }
+            ]
+        },
+        {
+            "name": "available_for_review",
+            "title": "Ready for Review",
+            "level": 3,
+            "color": "initial",
+            "permission": [
+                {
+                    "name": "view",
+                    "roles": "admin editor reviewer"
+                },
+                {
+                    "name": "list",
+                    "roles": "admin editor reviewer"
+                }
+            ],
+            "permisssion": {
+                "name": "transit",
+                "roles": "admin reviewer"
+            }
+        },
+        {
+            "name": "review",
+            "title": "Under Review",
+            "level": 3,
+            "color": "initial",
+            "permission": [
+                {
+                    "name": "view",
+                    "roles": "admin editor reviewer"
+                },
+                {
+                    "name": "list",
+                    "roles": "admin editor reviewer"
+                }
+            ],
+            "permisssion": [
+                {
+                    "name": "edit",
+                    "roles": "admin reviewer"
+                },
+                {
+                    "name": "transit",
+                    "roles": "admin reviewer"
+                }
+            ]
+        },
+        {
+            "name": "available_for_publication",
+            "title": "Ready for Publication",
+            "level": 4,
+            "color": "middle",
+            "permission": [
+                {
+                    "name": "view",
+                    "roles": "admin editor reviewer publisher"
+                },
+                {
+                    "name": "list",
+                    "roles": "admin editor reviewer publisher"
+                }
+            ],
+            "permisssion": {
+                "name": "transit",
+                "roles": "admin publisher"
+            }
+        },
+        {
+            "name": "publish",
+            "title": "REP available for Draft Report",
+            "level": 5,
+            "color": "final",
+            "permission": [
+                {
+                    "name": "view",
+                    "roles": "admin public"
+                },
+                {
+                    "name": "list",
+                    "roles": "admin publisher"
+                },
+                {
+                    "name": "transit",
+                    "roles": "admin publisher"
+                }
+            ]
+        }
+    ]},
+    "transitions": {"transition": [
+        {
+            "name": "make_editable",
+            "icon": "fa-thumbs-up",
+            "title": "Send for Editing",
+            "from": "draft",
+            "to": "editable"
+        },
+        {
+            "name": "make_drafting",
+            "icon": "fa-thumbs-up",
+            "title": "Back to Drafting",
+            "from": "editable",
+            "to": "draft"
+        },
+        {
+            "name": "send_for_review",
+            "icon": "fa-check",
+            "title": "Send for Review",
+            "from": "editable",
+            "to": "available_for_review"
+        },
+        {
+            "name": "accept_for_review",
+            "icon": "fa-building",
+            "title": "Accept for Review",
+            "from": "available_for_review",
+            "to": "review"
+        },
+        {
+            "name": "send_for_publication",
+            "icon": "fa-building",
+            "title": "Send for Publication",
+            "from": "review",
+            "to": "available_for_publication"
+        },
+        {
+            "name": "make_publish",
+            "icon": "fa-building",
+            "title": "Publish",
+            "from": "available_for_publication",
+            "to": "publish"
+        }
+    ]}
+}}

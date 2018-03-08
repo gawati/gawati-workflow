@@ -1,0 +1,30 @@
+{
+  "name": "gawati-workflow",
+  "version": "1.0.0",
+  "description": "Workflow for Gawati",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gawati/gawati-workflow.git"
+  },
+  "keywords": [
+    "gawati",
+    "workflow",
+    "akomaNtoso",
+    "xml",
+    "akoma",
+    "ntoso",
+    "Akoma-Ntoso",
+    "legal",
+    "workflow"
+  ],
+  "author": "Ashok Hariharan",
+  "license": "AGPL-3.0",
+  "bugs": {
+    "url": "https://github.com/gawati/gawati-workflow/issues"
+  },
+  "homepage": "https://github.com/gawati/gawati-workflow#readme"
+}
