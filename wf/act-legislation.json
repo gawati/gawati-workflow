@@ -98,12 +98,12 @@
                 {
                     "name": "list",
                     "roles": "admin editor reviewer"
+                },
+                {
+                    "name": "transit",
+                    "roles": "admin reviewer"
                 }
-            ],
-            "permisssion": {
-                "name": "transit",
-                "roles": "admin reviewer"
-            }
+            ]
         },
         {
             "name": "review",
@@ -118,9 +118,7 @@
                 {
                     "name": "list",
                     "roles": "admin editor reviewer"
-                }
-            ],
-            "permisssion": [
+                },
                 {
                     "name": "edit",
                     "roles": "admin reviewer"
@@ -144,16 +142,16 @@
                 {
                     "name": "list",
                     "roles": "admin editor reviewer publisher"
+                },
+                {
+                    "name": "transit",
+                    "roles": "admin publisher"
                 }
-            ],
-            "permisssion": {
-                "name": "transit",
-                "roles": "admin publisher"
-            }
+            ]
         },
         {
             "name": "publish",
-            "title": "REP available for Draft Report",
+            "title": "Published",
             "level": 5,
             "color": "final",
             "permission": [
@@ -209,11 +207,25 @@
             "to": "available_for_publication"
         },
         {
+            "name": "reject_review",
+            "icon": "fa-building",
+            "title": "Reject Review",
+            "from": "review",
+            "to": "editable"
+        },
+        {
             "name": "make_publish",
             "icon": "fa-building",
             "title": "Publish",
             "from": "available_for_publication",
             "to": "publish"
+        },
+        {
+            "name": "make_retract",
+            "icon": "fa-building",
+            "title": "Retract",
+            "from": "publish",
+            "to": "review"
         }
     ]}
 }}

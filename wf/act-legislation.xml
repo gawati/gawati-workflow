@@ -32,30 +32,30 @@
             color="initial">
             <permission name="view" roles="admin editor reviewer"/>
             <permission name="list" roles="admin editor reviewer" />
-            <permisssion name="transit" roles="admin reviewer" />
+            <permission name="transit" roles="admin reviewer" />
         </state>
         
         <state name="review" title="Under Review" level="3"
             color="initial">
             <permission name="view" roles="admin editor reviewer"/>
             <permission name="list" roles="admin editor reviewer" />
-            <permisssion name="edit" roles="admin reviewer" />
-            <permisssion name="transit" roles="admin reviewer" />
+            <permission name="edit" roles="admin reviewer" />
+            <permission name="transit" roles="admin reviewer" />
         </state>
         
         <state name="available_for_publication" title="Ready for Publication" level="4" color="middle">
             <permission name="view" roles="admin editor reviewer publisher"/>
             <permission name="list" roles="admin editor reviewer publisher" />
-            <permisssion name="transit" roles="admin publisher" />
+            <permission name="transit" roles="admin publisher" />
         </state>
         
-        <state name="publish"  title="REP available for Draft Report"
+        <state name="publish"  title="Published"
             level="5" color="final">
             <permission name="view" roles="admin public"/>
             <permission name="list" roles="admin publisher" />
             <permission name="transit" roles="admin publisher"/>
         </state>
-        
+
     </states>
     
     <transitions>
@@ -80,8 +80,14 @@
         <transition name="send_for_publication" icon="fa-building" title="Send for Publication" 
             from="review" to="available_for_publication" />
         
+        <transition name="reject_review" icon="fa-building" title="Reject Review" 
+            from="review" to="editable" />
+        
         <transition name="make_publish" icon="fa-building" title="Publish" 
             from="available_for_publication" to="publish" />
+        
+        <transition name="make_retract" icon="fa-building" title="Retract" 
+            from="publish" to="review" />
 
     </transitions>
 </workflow>
