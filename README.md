@@ -18,7 +18,7 @@ Transitions connect states, and allow building complex workflows using just a fe
 
 ``` bash
 java -jar <path to saxon9 he>/saxon9he.jar wf/act-legislation.xml xslt/wf2dotML.xsl  > act-legislation.dotML
-java -jar ./act-legislation.dotML xslt/dotml2dot.xsl > act-legislation.dot
+java -jar <path to saxon9 he>/saxon9he.jar ./act-legislation.dotML xslt/dotml2dot.xsl > act-legislation.dot
 
 ```
 
