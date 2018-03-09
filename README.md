@@ -41,6 +41,12 @@ node xml2json.js --name=wf/act-legislation.xml
 {"workflow":{"doctype":"act", .... "from":"publish","to":"review"}]}}}
 ```
 
+To serialize it to a file: 
+
+``` bash
+node xml2json.js --name=wf/act-legislation.xml > wf/act-legislation.json
+```
+
 ## Workflow structure
 
 Each workflow is defined using a `<workflow>` tag, the attributes `doctype` and `subtype` correspond to Akoma Ntoso document type and sub types for the document.  A workflow definition
