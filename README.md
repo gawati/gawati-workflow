@@ -24,6 +24,12 @@ java -jar ./act-legislation.dotML xslt/dotml2dot.xsl > act-legislation.dot
 dot ./act-legislation.dot -Tsvg -o ./act-legislation.svg
 ```
 
+See an example SVG generated from the model workflow:
+
+![Svg from workflow XML][https://cdn.rawgit.com/gawati/gawati-workflow/dev/wf/act-legislation.svg]
+
+
+
 
 ## Converting the Workflow XML to JSON
 
