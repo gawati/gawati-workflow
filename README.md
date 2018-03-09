@@ -26,10 +26,7 @@ dot ./act-legislation.dot -Tsvg -o ./act-legislation.svg
 
 See an example SVG generated from the model workflow:
 
-![Svg from workflow XML][https://cdn.rawgit.com/gawati/gawati-workflow/dev/wf/act-legislation.svg]
-
-
-
+![Svg from workflow XML](https://raw.githubusercontent.com/gawati/gawati-workflow/dev/wf/act-legislation.svg?sanitize=true)
 
 ## Converting the Workflow XML to JSON
 
