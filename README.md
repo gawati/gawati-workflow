@@ -51,6 +51,8 @@ Each workflow is defined using a `<workflow>` tag, the attributes `doctype` and 
 </workflow>
 ```
 
+### Permissions
+
 We describe available permissions in a `<permissions>` element. To the workflow package, the permissions are just labels and the application using the workflow needs to implement the corresponding functionality - except for the `transit` permission which is specific to the workflow, and states who is allowed to transit from one state of the workflow to another.
 
 ```
@@ -69,6 +71,8 @@ In the context of gawati the permissions are intended to have the following mean
     * delete - allows deleting a document
     * list - allows seeing the document in a list (but not viewing it)
     * transit - allows transiting from the state to another.
+
+### States
 
 States are defined in the `<states>` element and are uniquely identified via a `name` attribute. 
 In a workflow a state is always unique. `level` and `color` attributes are there for purely documentation related purposes and are non mandatory.
@@ -90,6 +94,8 @@ Permissions defined in a state have a particular meaning:
     * line 3 : `<permission name="list" roles="admin editor submitter" />` - only users with an admin, editor or submitter role can see the document in a listing
     * line 4: `<permission name="delete" roles="admin editor"/>` - only admin, editor users can delete the document
     * line 6: `<permission name="transit" roles="admin editor"/>` - only admin, editor users can transit the document via a state transition
+
+### Transitions
 
 Transitions allow the document to be moved from one state to another: 
 
