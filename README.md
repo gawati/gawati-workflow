@@ -1,23 +1,25 @@
 # Gawati Workflow
 
-Workflow configurations are created in XML, and converted into XML for application consumption. 
-You can generated directed graphs of the Worfklow based on the instructions below.
+Workflow configurations are supported in both XML and JSON,  they can be created in XML, and converted into JSON for application consumption. You can generate directed graphs of the Worfklow based on the instructions below (that requires the Workflow configuration to be in XML).
 
 Gawati Workflow is a stateful workflow, and is intended to support moving a document through different states via state transitions. 
 The Workflow allows defining who can do what in each state, and also who is allowed to transit between states. 
 Transitions connect states, and allow building complex workflows using just a few states. 
-
-## Generating Documentation
-
- * `npm install` in the package folder
- * Download [Saxon](https://sourceforge.net/projects/saxon/files/Saxon-HE/9.8/saxonHE9-8-0-1J.zip/download)
- * Install [Graphviz](https://graphviz.gitlab.io/download/)
 
 ## Test
 
   * `npm install` followed by ; 
   * `npm test`
   * Unit tests are found in `test/testWorkflow.js`, which should provide an overview of how the API can be used.
+
+
+## Generating Documentation
+
+ * NOTE: this requires the workflow configuration to be in XML format
+ * `npm install` in the package folder
+ * Download [Saxon](https://sourceforge.net/projects/saxon/files/Saxon-HE/9.8/saxonHE9-8-0-1J.zip/download)
+ * Install [Graphviz](https://graphviz.gitlab.io/download/)
+
 
 ### Convert the Workflow XML to graphviz dot format
 
@@ -37,7 +39,7 @@ See an example SVG generated from the model workflow:
 
 ![Svg from workflow XML](https://raw.githubusercontent.com/gawati/gawati-workflow/dev/wf/act-legislation.svg?sanitize=true)
 
-### Converting the Workflow XML to JSON
+## Converting the Workflow XML to JSON
 
 Run: 
 
@@ -49,7 +51,7 @@ node xml2json.js --name=wf/act-legislation.xml
 To serialize it to a file: 
 
 ``` bash
-node xml2json.js --name=wf/act-legislation.xml > wf/act-legislation.json
+node xml2json.js --name=wf/act-legislation.xml --output=wf/act-legislation.json
 ```
 
 ## Workflow structure
