@@ -13,6 +13,11 @@ Transitions connect states, and allow building complex workflows using just a fe
  * Download [Saxon](https://sourceforge.net/projects/saxon/files/Saxon-HE/9.8/saxonHE9-8-0-1J.zip/download)
  * Install [Graphviz](https://graphviz.gitlab.io/download/)
 
+## Test
+
+  * `npm install` followed by ; 
+  * `npm test`
+  * Unit tests are found in `test/testWorkflow.js`, which should provide an overview of how the API can be used.
 
 ### Convert the Workflow XML to graphviz dot format
 

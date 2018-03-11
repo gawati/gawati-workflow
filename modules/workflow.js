@@ -4,9 +4,12 @@ const util = require('util');
 const logr = require('../logging.js');
 
 
+/**
+ * This is the main workflow class. Each Workflow class represents a mapping onto a Workflow JSON document.
+ * 
+ * @class Workflow
+ */
 class Workflow {
-
-    TRANSIT_PERMISSION = 'transit';
 
     constructor() {
         this.wfInfo = {
@@ -44,7 +47,7 @@ class Workflow {
 
 
     /**
-     * 
+     * Get the permissions applicable in a state as an array of permission objects
      * 
      * @returns 
      * @memberof Workflow
@@ -55,7 +58,7 @@ class Workflow {
     }
 
     /**
-     * 
+     * Get the states applicable in a workflow as an array of states
      * 
      * @returns 
      * @memberof Workflow
@@ -69,7 +72,7 @@ class Workflow {
     }
 
     /**
-     * 
+     * Get the transitions applicable in a workflow as an array of transitions
      * 
      * @returns 
      * @memberof Workflow
@@ -83,7 +86,7 @@ class Workflow {
     }
 
     /**
-     * 
+     * Get a transition object by its name
      * 
      * @param {any} name 
      * @returns 
@@ -155,44 +158,40 @@ class Workflow {
      * @memberof Workflow
      */
     getTransitionsForFromState(stateName) {
-        return
-            JSON.parse(
-                JSON.stringify(this.getTransitions().filter( 
-                    (transiton) => transition.from === stateName
-                    )
-                )
-            );
+        return this.getTransitions().filter( 
+                    (transition) => transition.from === stateName
+                );
     }
 
 
     /**
-     * 
+     * Gets the next possible state names that one can transit to from a ``from`` state
      * 
      * @param {string} fromThisState 
      * @memberof Workflow
      */
     getNextStateNames(fromThisState) {
         let transitions = this.getTransitionsForFromState(fromThisState);
-        return
-            transitions.map( (transition) => transition.to);
+        let toStates = transitions.map( (transition) => transition.to);
+        return toStates;
     }
 
 
     /**
-     * 
+     * Gets the next possible state object that one can transit to from a ``from`` state
      * 
      * @param {string} fromThisState 
      * @memberof Workflow
      */
     getNextStateObjects(fromThisState) {
         let nextStates = this.getNextStateNames(fromThisState);
-        return
-            nextStates.map( (state) => this.getState(state));
+        let states = nextStates.map( (state) => this.getState(state));
+        return states;
     }
 
 
     /**
-     * 
+     * Gets a specific permission object specified by the permission name for a specific state object.
      * @param {*} stateObj 
      * @param {*} permissionName 
      */
@@ -216,17 +215,32 @@ class Workflow {
 
 
     /**
-     * Can the role specified in ``roleName`` transit to the transition name ``transitionName``
-     * @param {string} roleName name of a valid role
-     * @param {string} transitionName a name of a valid transition
+     * Can ``roleName`` transit to the transition name ``transitionName``, multiple role and transition combinations
+     * can be passed as an array. THe result returns the same array where each item has an ``outcome`` property which 
+     * can be a boolean. 
+     * 
+     * @param {array} an array of transition + role objects :
+     * 
+     *  .. code-block:: json
+     *      
+     *      [{'role':'editable', 'transition': 'make_editable'}, {'role':'reviewer', 'transition': 'make_publish'}]
+     * 
      */
-    canRoleTransit(roleName, transitionName) {
+    canRoleTransit(arrTransitionRole) {
+        const outcomes = arrTransitionRole.map( (transRole) => {
+            transRole.outcome = this._canRoleTransit(transRole.role, transRole.transition);
+            return transRole;
+        });
+        return outcomes;
+    }
+
+    _canRoleTransit(role, transition) {
         let states =  this.getStatesForTransition(transition);
         if (null !== states) {
             let fromState = states.from;
             let transitPermission = this.getStateObjectPermission(fromState, this.TRANSIT_PERMISSION);
             if (null !== transitPermission) {
-                return this.findInRoles(transitPermission.roles, roleName) ; 
+                return this.findInRoles(transitPermission.roles, role) ; 
             } else {
                 return false;
             }
@@ -236,5 +250,7 @@ class Workflow {
     }
 
 };
+
+Workflow.prototype.TRANSIT_PERMISSION = 'transit';
 
 module.exports.Workflow = Workflow ;
