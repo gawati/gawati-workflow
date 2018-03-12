@@ -3,20 +3,47 @@ const workflow = require('../modules/workflow');
 const fs = require('fs');
 const path = require('path');
 
-function arrangePath() {
-     return path.join('.', 'wf', 'test_wf.json') ; 
+function arrangeWfPath() {
+  return path.join('.', 'wf')
 }
+
+function arrangePath() {
+     return path.join(arrangeWfPath(), 'test_wf.json') ; 
+}
+
+describe('discover()', function() {
+    it('Finds workflows in specified paths and loads them into memory', function(done) {
+      //arrange
+      var wfFiles = ['act-legislation.json', 'test_wf.json'];
+      workflow.discover(path.join('.', 'wf'))
+        .then( (workflows) => {
+            for (let workflow of workflows) {
+              let wfName = workflow.name ; 
+              let wfObject = workflow.object ;
+              const wfIndex = wfFiles.indexOf(wfName);
+              expect(wfIndex).to.be.greaterThan(-1);
+              expect(wfObject.wfInfo.status).to.equal('valid');
+              const objExists = Object.keys(wfObject.wfInfo.wf).length === 0 && wfObject.wfInfo.wf.constructor === Object ;
+              expect(objExists).to.equal(false);
+            }
+        })
+        .catch( (err) => {
+          console.log(" ERROR HAPEND ", err);
+        });
+      done();
+      })
+});
 
 describe('initAsync()', function () {
     it('Loads workflow asynchronously', function (done) {
       // arrange      
-      var wfJson = fs.readFileSync(arrangePath(), 'utf8');
+      var wfJson = {"workflow":{"doctype":"test","subtype":"subtest","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"editable","to":"publish"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"}]}}};
       // 2. ACT
       var wf = new workflow.Workflow();
       wf.initAsync(arrangePath())
         .then( (ret) => { 
             var s = JSON.stringify(wf.wfInfo.wf)  ;
-            expect(s).to.equal(wfJson);
+            expect(JSON.stringify(wfJson)).to.equal(s);
             done();
         })
         .catch( (err) => { console.log(" ERR " , err) ; throw err;  });

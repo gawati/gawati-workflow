@@ -2,6 +2,29 @@ const Promise = require('bluebird');
 const fs = Promise.promisifyAll(require("fs"));
 const util = require('util');
 const logr = require('../logging.js');
+const path = require('path');
+
+
+/**
+ * Discovers workflow json files in a folder and loads them into an array and returns
+ * the array
+ * @param {string} inThisFolder - path to a folder containing workflows
+ */
+const discover = async (inThisFolder) => {
+    const extFilter = "json";
+    const allFiles = await fs.readdirAsync(inThisFolder);
+    const workflowFiles = allFiles.filter( (item) => path.extname(item) === `.${extFilter}` );
+    const discoveredWorkflows = [];
+    for (let workflowFile of workflowFiles) {
+        let wfObj = new Workflow();
+        const c = await wfObj.initAsync(path.join(inThisFolder, workflowFile));
+        if (wfObj.wfInfo.status === 'valid') {
+            const foundWf = {'name': workflowFile, 'object':wfObj};
+            discoveredWorkflows.push(foundWf);
+        }
+    }
+    return discoveredWorkflows;
+};
 
 
 /**
@@ -14,7 +37,8 @@ class Workflow {
     constructor() {
         this.wfInfo = {
             timestamp: Math.floor(Date.now() / 1000),
-            wf: {}
+            wf: {},
+            status: "empty"
         };
     }
 
@@ -28,7 +52,26 @@ class Workflow {
         var data = {};
         try {
          data = await fs.readFileAsync(wfJsonPath);
-         this.wfInfo.wf = JSON.parse(data); 
+         const wfFound = JSON.parse(data); 
+         if (wfFound.hasOwnProperty('workflow')) {
+             if (wfFound.workflow.hasOwnProperty('doctype') && 
+                wfFound.workflow.hasOwnProperty('states') && 
+                wfFound.workflow.hasOwnProperty('permissions') && 
+                wfFound.workflow.hasOwnProperty('transitions')) {
+                    if (Array.isArray(wfFound.workflow.states.state) 
+                        && Array.isArray(wfFound.workflow.permissions.permission) 
+                        && Array.isArray(wfFound.workflow.transitions.transition)) {
+                            this.wfInfo.wf = wfFound;      
+                            this.wfInfo.status = "valid";
+                        } else {
+                            this.wfInfo.wf = wfFound ; 
+                            this.wfInfo.status = "invalid";
+                        }
+             }
+         } else {
+             this.wfInfo.wf = wfFound ; 
+             this.wfInfo.status = "invalid";
+         }
         } catch(error) {
             logr.error("Error in initAsync while parsing JSON ", error);
         }
@@ -203,6 +246,7 @@ class Workflow {
 
     /**
      * Internal api find if the role exists in a string seperated list of roles.
+     * 
      * @param {string} roles value of the roles attribute from ``permission``  of a state
      * @param {string} findThisRole check if this role exists in roles
      */
@@ -254,3 +298,4 @@ class Workflow {
 Workflow.prototype.TRANSIT_PERMISSION = 'transit';
 
 module.exports.Workflow = Workflow ;
+module.exports.discover = discover ; 
