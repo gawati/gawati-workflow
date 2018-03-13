@@ -297,5 +297,7 @@ class Workflow {
 
 Workflow.prototype.TRANSIT_PERMISSION = 'transit';
 
-module.exports.Workflow = Workflow ;
-module.exports.discover = discover ; 
+module.exports = {
+    Workflow: Workflow,
+    discover: discover
+};
