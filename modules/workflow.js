@@ -26,6 +26,27 @@ const discover = async (inThisFolder) => {
     return discoveredWorkflows;
 };
 
+/**
+ * Synchronously Discovers workflow json files in a folder and loads them into an array and returns
+ * the array
+ * @param {string} inThisFolder - path to a folder containing workflows
+ */
+const discoverSync = (inThisFolder) => {
+    const extFilter = "json";
+    const allFiles = fs.readdirSync(inThisFolder);
+    const workflowFiles = allFiles.filter( (item) => path.extname(item) === `.${extFilter}` );
+    const discoveredWorkflows = [];
+    for (let workflowFile of workflowFiles) {
+        let wfObj = new Workflow();
+        const c = wfObj.initSync(path.join(inThisFolder, workflowFile));
+        if (wfObj.wfInfo.status === 'valid') {
+            const foundWf = {'name': workflowFile, 'object':wfObj};
+            discoveredWorkflows.push(foundWf);
+        }
+    }
+    return discoveredWorkflows;
+};
+
 
 /**
  * This is the main workflow class. Each Workflow class represents a mapping onto a Workflow JSON document.
@@ -52,31 +73,55 @@ class Workflow {
         var data = {};
         try {
          data = await fs.readFileAsync(wfJsonPath);
-         const wfFound = JSON.parse(data); 
-         if (wfFound.hasOwnProperty('workflow')) {
-             if (wfFound.workflow.hasOwnProperty('doctype') && 
-                wfFound.workflow.hasOwnProperty('states') && 
-                wfFound.workflow.hasOwnProperty('permissions') && 
-                wfFound.workflow.hasOwnProperty('transitions')) {
-                    if (Array.isArray(wfFound.workflow.states.state) 
-                        && Array.isArray(wfFound.workflow.permissions.permission) 
-                        && Array.isArray(wfFound.workflow.transitions.transition)) {
-                            this.wfInfo.wf = wfFound;      
-                            this.wfInfo.status = "valid";
-                        } else {
-                            this.wfInfo.wf = wfFound ; 
-                            this.wfInfo.status = "invalid";
-                        }
-             }
-         } else {
-             this.wfInfo.wf = wfFound ; 
-             this.wfInfo.status = "invalid";
-         }
+         this.__initSyncAsync(data);
         } catch(error) {
             logr.error("Error in initAsync while parsing JSON ", error);
         }
         return data;
     };
+
+    /**
+     * Synchronously initializes the workflow by attempting to load it
+     * Caller will have to check if the wf property is set or not.
+     *
+     * @memberof Workflow
+     */
+    initSync (wfJsonPath) {
+        var data = {};
+        try {
+         data = fs.readFileSync(wfJsonPath);
+         this.__initSyncAsync(data);
+        } catch(error) {
+            logr.error("Error in initSync while parsing JSON ", error);
+        }
+        return data;
+    };
+
+    /**
+     * Called from both initSync and initAsync
+     */
+    __initSyncAsync(data) {
+        const wfFound = JSON.parse(data);
+        if (wfFound.hasOwnProperty('workflow')) {
+            if (wfFound.workflow.hasOwnProperty('doctype') &&
+               wfFound.workflow.hasOwnProperty('states') &&
+               wfFound.workflow.hasOwnProperty('permissions') &&
+               wfFound.workflow.hasOwnProperty('transitions')) {
+                   if (Array.isArray(wfFound.workflow.states.state)
+                       && Array.isArray(wfFound.workflow.permissions.permission)
+                       && Array.isArray(wfFound.workflow.transitions.transition)) {
+                           this.wfInfo.wf = wfFound;
+                           this.wfInfo.status = "valid";
+                       } else {
+                           this.wfInfo.wf = wfFound ;
+                           this.wfInfo.status = "invalid";
+                       }
+            }
+        } else {
+            this.wfInfo.wf = wfFound ;
+            this.wfInfo.status = "invalid";
+        }
+    }
 
     /**
      * Checks if the workflow is initialized. 
@@ -299,5 +344,6 @@ Workflow.prototype.TRANSIT_PERMISSION = 'transit';
 
 module.exports = {
     Workflow: Workflow,
-    discover: discover
+    discover: discover,
+    discoverSync: discoverSync
 };
