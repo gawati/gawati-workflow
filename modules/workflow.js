@@ -47,6 +47,7 @@ const discoverSync = (inThisFolder) => {
     return discoveredWorkflows;
 };
 
+
 /**
  * This is the main workflow class. Each Workflow class represents a mapping onto a Workflow JSON document.
  * 
@@ -72,26 +73,7 @@ class Workflow {
         var data = {};
         try {
          data = await fs.readFileAsync(wfJsonPath);
-         const wfFound = JSON.parse(data); 
-         if (wfFound.hasOwnProperty('workflow')) {
-             if (wfFound.workflow.hasOwnProperty('doctype') && 
-                wfFound.workflow.hasOwnProperty('states') && 
-                wfFound.workflow.hasOwnProperty('permissions') && 
-                wfFound.workflow.hasOwnProperty('transitions')) {
-                    if (Array.isArray(wfFound.workflow.states.state) 
-                        && Array.isArray(wfFound.workflow.permissions.permission) 
-                        && Array.isArray(wfFound.workflow.transitions.transition)) {
-                            this.wfInfo.wf = wfFound;      
-                            this.wfInfo.status = "valid";
-                        } else {
-                            this.wfInfo.wf = wfFound ; 
-                            this.wfInfo.status = "invalid";
-                        }
-             }
-         } else {
-             this.wfInfo.wf = wfFound ; 
-             this.wfInfo.status = "invalid";
-         }
+         this.__initSyncAsync(data);
         } catch(error) {
             logr.error("Error in initAsync while parsing JSON ", error);
         }
@@ -104,35 +86,42 @@ class Workflow {
      *
      * @memberof Workflow
      */
-    async initSync (wfJsonPath) {
+    initSync (wfJsonPath) {
         var data = {};
         try {
          data = fs.readFileSync(wfJsonPath);
-         const wfFound = JSON.parse(data);
-         if (wfFound.hasOwnProperty('workflow')) {
-             if (wfFound.workflow.hasOwnProperty('doctype') &&
-                wfFound.workflow.hasOwnProperty('states') &&
-                wfFound.workflow.hasOwnProperty('permissions') &&
-                wfFound.workflow.hasOwnProperty('transitions')) {
-                    if (Array.isArray(wfFound.workflow.states.state)
-                        && Array.isArray(wfFound.workflow.permissions.permission)
-                        && Array.isArray(wfFound.workflow.transitions.transition)) {
-                            this.wfInfo.wf = wfFound;
-                            this.wfInfo.status = "valid";
-                        } else {
-                            this.wfInfo.wf = wfFound ;
-                            this.wfInfo.status = "invalid";
-                        }
-             }
-         } else {
-             this.wfInfo.wf = wfFound ;
-             this.wfInfo.status = "invalid";
-         }
+         this.__initSyncAsync(data);
         } catch(error) {
             logr.error("Error in initSync while parsing JSON ", error);
         }
         return data;
     };
+
+    /**
+     * Called from both initSync and initAsync
+     */
+    __initSyncAsync(data) {
+        const wfFound = JSON.parse(data);
+        if (wfFound.hasOwnProperty('workflow')) {
+            if (wfFound.workflow.hasOwnProperty('doctype') &&
+               wfFound.workflow.hasOwnProperty('states') &&
+               wfFound.workflow.hasOwnProperty('permissions') &&
+               wfFound.workflow.hasOwnProperty('transitions')) {
+                   if (Array.isArray(wfFound.workflow.states.state)
+                       && Array.isArray(wfFound.workflow.permissions.permission)
+                       && Array.isArray(wfFound.workflow.transitions.transition)) {
+                           this.wfInfo.wf = wfFound;
+                           this.wfInfo.status = "valid";
+                       } else {
+                           this.wfInfo.wf = wfFound ;
+                           this.wfInfo.status = "invalid";
+                       }
+            }
+        } else {
+            this.wfInfo.wf = wfFound ;
+            this.wfInfo.status = "invalid";
+        }
+    }
 
     /**
      * Checks if the workflow is initialized. 
