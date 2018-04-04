@@ -34,6 +34,24 @@ describe('discover()', function() {
       })
 });
 
+describe('discoverSync()', function() {
+    it('Finds workflows in specified paths and loads them into memory synchronously', function(done) {
+      //arrange
+      var wfFiles = ['act-legislation.json', 'test_wf.json'];
+      var workflows = workflow.discoverSync(path.join('.', 'wf'));
+      for (let workflow of workflows) {
+        let wfName = workflow.name ;
+        let wfObject = workflow.object ;
+        const wfIndex = wfFiles.indexOf(wfName);
+        expect(wfIndex).to.be.greaterThan(-1);
+        expect(wfObject.wfInfo.status).to.equal('valid');
+        const objExists = Object.keys(wfObject.wfInfo.wf).length === 0 && wfObject.wfInfo.wf.constructor === Object ;
+        expect(objExists).to.equal(false);
+      }
+      done();
+    })
+});
+
 describe('initAsync()', function () {
     it('Loads workflow asynchronously', function (done) {
       // arrange      
@@ -48,6 +66,19 @@ describe('initAsync()', function () {
         })
         .catch( (err) => { console.log(" ERR " , err) ; throw err;  });
   
+    });
+  });
+
+  describe('initSync()', function () {
+    it('Loads workflow synchronously', function (done) {
+      // arrange
+      var wfJson = {"workflow":{"doctype":"test","subtype":"subtest","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"editable","to":"publish"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"}]}}};
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      var ret = wf.initSync(arrangePath());
+      var s = JSON.stringify(wf.wfInfo.wf)  ;
+      expect(JSON.stringify(wfJson)).to.equal(s);
+      done();
     });
   });
 
@@ -92,6 +123,24 @@ describe('initAsync()', function () {
     });
   });
 
+  describe('getStates()', function () {
+    it('Checks if states are returned synchronously', function (done) {
+
+      // 1. ARRANGE
+      const statesNamesExpected = ['draft', 'editable', 'publish'];
+
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      var ret = wf.initSync(arrangePath());
+      const states = wf.getStates();
+      expect(states.length).to.be.equal(statesNamesExpected.length);
+      states.map( (state) =>  {
+        var foundIndex = statesNamesExpected.indexOf(state.name) ;
+        expect(foundIndex).to.be.greaterThan(-1);
+      });
+      done();
+    });
+  });
   
   describe('getTransitions()', function () {
     it('Checks if transitions are returned', function (done) {
