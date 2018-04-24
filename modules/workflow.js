@@ -133,6 +133,13 @@ class Workflow {
         return  ! (Object.keys(this.wfInfo.wf).length === 0 && this.wfInfo.wf.constructor === Object)
     }
 
+    /**
+     * Returns type information about a workflow as an object with doctype and subtype properties
+     */
+    getWorkflowTypeInfo() {
+        const wfType =  {doctype: this.wfInfo.wf.workflow.doctype, subtype: this.wfInfo.wf.workflow.subtype};
+        return wfType;
+    }
 
     /**
      * Get the permissions applicable in a state as an array of permission objects

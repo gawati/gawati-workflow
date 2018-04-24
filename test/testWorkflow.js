@@ -82,6 +82,24 @@ describe('initAsync()', function () {
     });
   });
 
+  describe('getWorkflowTypeInfo()', function () {
+    it('Get the workflow type information', function (done) {
+      
+      // 1. ARRANGE
+      const shouldExpect = {doctype: 'test', subtype: 'subtest'}; 
+      
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      wf.initAsync(arrangePath())
+        .then( (ret) => { 
+            expect(wf.getWorkflowTypeInfo()).to.deep.equal(shouldExpect);
+            done();
+        })
+        .catch( (err) => { throw err;  });
+  
+    });
+  });
+  
   describe('isWorkflowInitialized()', function () {
     it('Checks if Workflow is initialized', function (done) {
       
