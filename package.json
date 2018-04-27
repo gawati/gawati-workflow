@@ -7,7 +7,9 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build": "",
+    "vars": "env | grep npm_package_ | grep -v npm_lifecycle_script"
   },
   "repository": {
     "type": "git",
