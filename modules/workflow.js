@@ -137,7 +137,11 @@ class Workflow {
      * Returns type information about a workflow as an object with doctype and subtype properties
      */
     getWorkflowTypeInfo() {
-        const wfType =  {doctype: this.wfInfo.wf.workflow.doctype, subtype: this.wfInfo.wf.workflow.subtype};
+        const wfType =  {
+            doctype: this.wfInfo.wf.workflow.doctype,
+            subtype: this.wfInfo.wf.workflow.subtype,
+            status:  this.wfInfo.status
+        };
         return wfType;
     }
 

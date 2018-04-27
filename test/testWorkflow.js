@@ -86,7 +86,7 @@ describe('initAsync()', function () {
     it('Get the workflow type information', function (done) {
       
       // 1. ARRANGE
-      const shouldExpect = {doctype: 'test', subtype: 'subtest'}; 
+      const shouldExpect = {doctype: 'test', subtype: 'subtest', status: 'valid'}; 
       
       // 2. ACT
       var wf = new workflow.Workflow();
