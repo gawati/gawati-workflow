@@ -28,6 +28,15 @@
             <permission name="transit" roles="admin editor"/>
         </state>
 
+        <state name="processing" title="Processing" level="2" color="initial">
+            <permission name="view" roles="admin editor"/>
+            <permission name="list" roles="admin editor submitter" />
+            <permission name="delete" roles="admin editor"/>
+            <permission name="edit" roles="admin editor"/>
+            <permission name="transit" roles="admin editor"/>
+        </state>
+
+
         <state name="publish"  title="Published"
             level="5" color="final">
             <permission name="view" roles="admin public"/>
@@ -54,7 +63,7 @@
             from="editable" to="processing" />
 
         <transition name="make_publish" icon="fa-building" title="Publish" 
-            from="processing" to="publish" bySystem="true()" />
+            from="processing" to="publish" bySystem="true" />
             
         
         <transition name="make_retract" icon="fa-building" title="Retract" 
