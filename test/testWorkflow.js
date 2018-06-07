@@ -3,6 +3,8 @@ const workflow = require('../modules/workflow');
 const fs = require('fs');
 const path = require('path');
 
+const TEST_WF_JSON = {"workflow":{"doctype":"test","subtype":"subtest","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"processing","title":"Processing","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_processing","icon":"fa-building","title":"Send for Publish","from":"editable","to":"processing"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"processing","to":"publish","bySystem":"true"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"}]}}};
+
 function arrangeWfPath() {
   return path.join('.', 'wf')
 }
@@ -55,7 +57,7 @@ describe('discoverSync()', function() {
 describe('initAsync()', function () {
     it('Loads workflow asynchronously', function (done) {
       // arrange      
-      var wfJson = {"workflow":{"doctype":"test","subtype":"subtest","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"editable","to":"publish"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"}]}}};
+      var wfJson = TEST_WF_JSON;
       // 2. ACT
       var wf = new workflow.Workflow();
       wf.initAsync(arrangePath())
@@ -72,7 +74,7 @@ describe('initAsync()', function () {
   describe('initSync()', function () {
     it('Loads workflow synchronously', function (done) {
       // arrange
-      var wfJson = {"workflow":{"doctype":"test","subtype":"subtest","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"editable","to":"publish"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"}]}}};
+      var wfJson = TEST_WF_JSON;
       // 2. ACT
       var wf = new workflow.Workflow();
       var ret = wf.initSync(arrangePath());
@@ -123,7 +125,7 @@ describe('initAsync()', function () {
     it('Checks if states are returned', function (done) {
       
       // 1. ARRANGE
-      const statesNamesExpected = ['draft', 'editable', 'publish'];
+      const statesNamesExpected = ['draft', 'editable', 'processing','publish'];
       
       // 2. ACT
       var wf = new workflow.Workflow();
@@ -145,7 +147,7 @@ describe('initAsync()', function () {
     it('Checks if states are returned synchronously', function (done) {
 
       // 1. ARRANGE
-      const statesNamesExpected = ['draft', 'editable', 'publish'];
+      const statesNamesExpected = ['draft', 'editable', 'processing', 'publish'];
 
       // 2. ACT
       var wf = new workflow.Workflow();
@@ -164,7 +166,7 @@ describe('initAsync()', function () {
     it('Checks if transitions are returned', function (done) {
       
       // 1. ARRANGE
-      const transitionNamesExpected = ['make_editable', 'make_drafting', 'make_publish', 'make_retract'];
+      const transitionNamesExpected = ['make_editable', 'make_drafting', 'make_publish', 'make_processing', 'make_retract'];
       
       // 2. ACT
       var wf = new workflow.Workflow();
@@ -219,6 +221,27 @@ describe('initAsync()', function () {
     });
   });
 
+  describe('isSystemTransition()', function () {
+    it('Checks if a transition is a system transition', function (done) {
+      
+      // 1. ARRANGE
+      const expectedTransitionSystemFlags = {"make_processing": false, "make_publish": true};
+      
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      wf.initAsync(arrangePath())
+        .then( (ret) => { 
+            const retTransition1 = wf.isSystemTransition('make_processing');
+            expect(retTransition1).to.equal(expectedTransitionSystemFlags['make_processing']);
+            const retTransition2 = wf.isSystemTransition('make_publish');
+            expect(retTransition2).to.equal(expectedTransitionSystemFlags['make_publish']);
+            done();
+        })
+        .catch( (err) => { throw err;  });
+    });
+  });
+
+
 
   describe('getStatesForTransition()', function () {
     it('Checks if the state objects for a transition are returned correctly', function (done) {
@@ -245,7 +268,7 @@ describe('initAsync()', function () {
     it('Gets the transitions where the state appears as the from origin state', function (done) {
       
       // 1. ARRANGE
-      const expectedTransitions = ['make_drafting', 'make_publish'];
+      const expectedTransitions = ['make_drafting', 'make_processing'];
       
       // 2. ACT
       var wf = new workflow.Workflow();
@@ -267,7 +290,7 @@ describe('initAsync()', function () {
     it('Gets the next possible states from a state', function (done) {
       
       // 1. ARRANGE
-      const expectedStates = ['draft', 'publish'];
+      const expectedStates = ['draft', 'processing'];
       
       // 2. ACT
       var wf = new workflow.Workflow();

@@ -196,6 +196,18 @@ class Workflow {
         return theTransition.length > 0 ? Object.assign({}, theTransition[0]) : null ;
     }
 
+    /**
+     * Checks if the named transition is a system transition
+     * @param {*} name name of the transition
+     */
+    isSystemTransition(name) {
+        const transition = this.getTransition(name);
+        if (transition.bySystem) {
+            return transition.bySystem == 'true' || transition.bySystem == true ;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Gets state object for a specified ``stateName``
