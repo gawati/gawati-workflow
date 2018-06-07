@@ -1,6 +1,6 @@
 {
   "name": "gawati-workflow",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Workflow for Gawati",
   "main": "index.js",
   "directories": {
