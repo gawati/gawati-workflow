@@ -50,8 +50,12 @@
         <transition name="make_drafting" icon="fa-thumbs-up" title="Back to Drafting"
             from="editable" to="draft" />
 
+        <transition name="make_processing" icon="fa-building" title="Send for Publish" 
+            from="editable" to="processing" />
+
         <transition name="make_publish" icon="fa-building" title="Publish" 
-            from="editable" to="publish" />
+            from="processing" to="publish" bySystem="true()" />
+            
         
         <transition name="make_retract" icon="fa-building" title="Retract" 
             from="publish" to="editable" />
