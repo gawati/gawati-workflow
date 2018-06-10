@@ -59,8 +59,10 @@ class Workflow {
         this.wfInfo = {
             timestamp: Math.floor(Date.now() / 1000),
             wf: {},
-            status: "empty"
+            status: "empty",
+            module: null
         };
+
     }
 
     /**
@@ -145,6 +147,19 @@ class Workflow {
         return wfType;
     }
 
+    loadWorkflowModule() {
+        if (this.wfInfo.wf.workflow.modulePath) {
+            if (this.wfInfo.module !== null) {
+                return this.wfInfo.module;
+            } else {
+                this.wfInfo.module = require(this.wfInfo.wf.workflow.modulePath);
+                return this.wfInfo.module;
+            }
+        } else {
+            return null;
+        }
+    }
+
     /**
      * Get the permissions applicable in a state as an array of permission objects
      * 
@@ -207,6 +222,51 @@ class Workflow {
         } else {
             return false;
         }
+    }
+
+    /**
+     * Gets the ``preTransit`` action associated with a transition
+     * @param {*} transitName 
+     */
+    getPreTransitAction(transitName) {
+        const transition = this.getTransition(transitName);
+        if (transition.preTransit) {
+            return transition.preTransit;
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Gets the ``postTransit`` action associated with a transition
+     * @param {*} transitName 
+     */
+    getPostTransitAction(transitName) {
+        const transition = this.getTransition(transitName);
+        if (transition.postTransit) {
+            return transition.postTransit;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Calls a Pre/Post transit action, only the actionName is expected, and params can be passed.
+     * The module function needs to implement the first param as the workflow object, second param
+     * can be any arbitrary object passed by the caller. 
+     * @param {*} transitName 
+     */    
+    callModuleAction(actionName, params) {
+        const module = this.loadWorkflowModule();
+        if (module !== null) {
+            if (module.hasOwnProperty(actionName)) {
+                // call the function with params
+                return module[actionName](this.wfInfo.wf, params);
+            } else {
+                return null;
+            }
+        }
+        return null;
     }
 
     /**

@@ -3,7 +3,7 @@ const workflow = require('../modules/workflow');
 const fs = require('fs');
 const path = require('path');
 
-const TEST_WF_JSON = {"workflow":{"doctype":"test","subtype":"subtest","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"processing","title":"Processing","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_processing","icon":"fa-building","title":"Send for Publish","from":"editable","to":"processing"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"processing","to":"publish","bySystem":"true"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"}]}}};
+const TEST_WF_JSON = {"workflow":{"doctype":"test","subtype":"subtest","modulePath":"../test/testModule.js","permissions":{"permission":[{"name":"view","title":"View","icon":"fa-eye"},{"name":"edit","title":"Edit","icon":"fa-pencil"},{"name":"delete","title":"Delete","icon":"fa-trash-o"},{"name":"list","title":"List","icon":"fa-flag"},{"name":"transit","title":"Transit","icon":"fa-flag"}]},"states":{"state":[{"name":"draft","title":"Draft","level":"1","color":"initial","permission":[{"name":"view","roles":"admin submitter"},{"name":"list","roles":"admin submitter"},{"name":"edit","roles":"admin submitter"},{"name":"delete","roles":"admin submitter"},{"name":"transit","roles":"admin submitter"}]},{"name":"editable","title":"Editable","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"processing","title":"Processing","level":"2","color":"initial","permission":[{"name":"view","roles":"admin editor"},{"name":"list","roles":"admin editor submitter"},{"name":"delete","roles":"admin editor"},{"name":"edit","roles":"admin editor"},{"name":"transit","roles":"admin editor"}]},{"name":"publish","title":"Published","level":"5","color":"final","permission":[{"name":"view","roles":"admin public"},{"name":"list","roles":"admin publisher"},{"name":"transit","roles":"admin publisher editor"}]}]},"transitions":{"transition":[{"name":"make_editable","icon":"fa-thumbs-up","title":"Send for Editing","from":"draft","to":"editable"},{"name":"make_drafting","icon":"fa-thumbs-up","title":"Back to Drafting","from":"editable","to":"draft"},{"name":"make_processing","icon":"fa-building","title":"Send for Publish","from":"editable","to":"processing","postTransit":"doProcessing"},{"name":"make_publish","icon":"fa-building","title":"Publish","from":"processing","to":"publish","bySystem":"true","preTransit":"doPreProcessing"},{"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable","bySystem":"false"}]}}};
 
 function arrangeWfPath() {
   return path.join('.', 'wf')
@@ -207,7 +207,7 @@ describe('initAsync()', function () {
     it('Checks if a transition is returned correctly', function (done) {
       
       // 1. ARRANGE
-      const expectedTransition = {"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable"};
+      const expectedTransition = {"name":"make_retract","icon":"fa-building","title":"Retract","from":"publish","to":"editable","bySystem":"false"};
       
       // 2. ACT
       var wf = new workflow.Workflow();
@@ -225,16 +225,19 @@ describe('initAsync()', function () {
     it('Checks if a transition is a system transition', function (done) {
       
       // 1. ARRANGE
-      const expectedTransitionSystemFlags = {"make_processing": false, "make_publish": true};
+      const expectedTransitionSystemFlags = {"make_processing": false, "make_publish": true, "make_retract": false};
       
       // 2. ACT
       var wf = new workflow.Workflow();
       wf.initAsync(arrangePath())
-        .then( (ret) => { 
-            const retTransition1 = wf.isSystemTransition('make_processing');
-            expect(retTransition1).to.equal(expectedTransitionSystemFlags['make_processing']);
-            const retTransition2 = wf.isSystemTransition('make_publish');
-            expect(retTransition2).to.equal(expectedTransitionSystemFlags['make_publish']);
+        .then( (ret) => {
+            const tranNames  = Object.keys(expectedTransitionSystemFlags); 
+            for (var i=0; i < tranNames.length ; i++) {
+              const retTransition = wf.isSystemTransition(tranNames[i]);
+              expect(retTransition).to.equal(
+                expectedTransitionSystemFlags[tranNames[i]]
+              );
+            }
             done();
         })
         .catch( (err) => { throw err;  });
@@ -242,6 +245,74 @@ describe('initAsync()', function () {
   });
 
 
+  describe('getPreTransit()', function () {
+    it('gets Pre Transit action name', function (done) {
+      
+      // 1. ARRANGE
+      const expectedActionName = "doPreProcessing";
+      
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      wf.initAsync(arrangePath())
+        .then( (ret) => {
+          const preTrans = wf.getPreTransitAction("make_publish");
+          expect(preTrans).to.equal(expectedActionName);
+          done();
+        })
+        .catch( (err) => { throw err;  });
+    });
+  });
+
+  describe('getPostTransit()', function () {
+    it('gets Post Transit action name', function (done) {
+      
+      // 1. ARRANGE
+      const expectedActionName = "doProcessing";
+      
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      wf.initAsync(arrangePath())
+        .then( (ret) => {
+          const preTrans = wf.getPostTransitAction("make_processing");
+          expect(preTrans).to.equal(expectedActionName);
+          done();
+        })
+        .catch( (err) => { throw err;  });
+    });
+  });
+  
+  describe('loadWorkflowModule()', function () {
+    it('Loads Workflow MOdule', function (done) {
+     
+      // 2. ACT
+      var wf = new workflow.Workflow();
+      wf.initAsync(arrangePath())
+        .then( (ret) => {
+          const wfModule = wf.loadWorkflowModule();
+          expect(wfModule).to.not.equal(null);
+          done();
+        })
+        .catch( (err) => { throw err;  });
+    });
+  });
+
+
+  
+  describe('callModuleAction()', function () {
+    it('calls a pre or post transit action as loaded by the workflow', function (done) {
+      var wf = new workflow.Workflow();
+      wf.initAsync(arrangePath())
+        .then( (ret) => {
+          const actionRet = wf.callModuleAction('doProcessing', {name: "callingDoProcessing"});
+          expect(actionRet.params.name).to.equal("callingDoProcessing");
+          expect(actionRet.params.valueFromFunction).to.equal("TEST_VAL");
+          done();
+        })
+        .catch( (err) => { throw err;  });
+    });
+  });
+
+  
 
   describe('getStatesForTransition()', function () {
     it('Checks if the state objects for a transition are returned correctly', function (done) {

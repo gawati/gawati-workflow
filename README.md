@@ -6,11 +6,13 @@ Gawati Workflow is a stateful workflow, and is intended to support moving a docu
 The Workflow allows defining who can do what in each state, and also who is allowed to transit between states. 
 Transitions connect states, and allow building complex workflows using just a few states. 
 
+The typical process is to edit the workflow in XML and generate the production JSON out of that using the `xml2jon` script which has been provided.
+
 ## Test
 
   * `npm install` followed by ; 
   * `npm test`
-  * Unit tests are found in `test/testWorkflow.js`, which should provide an overview of how the API can be used.
+  * Unit tests are found in `test/testWorkflow.js`, which provide an overview of how the API can be used.
 
 
 ## Generating Documentation
@@ -146,3 +148,6 @@ The `transit` permission on the `editable` state (which is the `from` state), pe
     </state>
 ```
 
+### Actions
+
+Transitions support both pre and post transit actions. These are essentially JS functions which can be configured on the workflow via a custom module and triggered by the calling API doing the transition. See `testModule.js` in the unit tests, for an example of how this can be used.
