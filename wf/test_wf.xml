@@ -1,8 +1,8 @@
-<workflow doctype="test" subtype="subtest">
+<workflow doctype="test" subtype="subtest" modulePath="../test/testModule.js">
     
     <!-- this is a model workflow, the JSON wf is exported out of this --> 
     <!-- this is in XML to make it easier to document, since XML accepts comments, and we can also generate diagrams --> 
-    
+    <!-- module path is relative to the current working directory NOT the script directory -->
     <permissions>
         <permission name="view" title="View" icon="fa-eye"/>
         <permission name="edit" title="Edit" icon="fa-pencil"/>
@@ -60,14 +60,14 @@
             from="editable" to="draft" />
 
         <transition name="make_processing" icon="fa-building" title="Send for Publish" 
-            from="editable" to="processing" />
+            from="editable" to="processing" postTransit="doProcessing" />
 
         <transition name="make_publish" icon="fa-building" title="Publish" 
-            from="processing" to="publish" bySystem="true" />
+            from="processing" to="publish" bySystem="true" preTransit="doPreProcessing" />
             
         
         <transition name="make_retract" icon="fa-building" title="Retract" 
-            from="publish" to="editable" />
+            from="publish" to="editable" bySystem="false" />
 
     </transitions>
 </workflow>
