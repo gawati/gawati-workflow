@@ -147,19 +147,6 @@ class Workflow {
         return wfType;
     }
 
-    loadWorkflowModule() {
-        if (this.wfInfo.wf.workflow.modulePath) {
-            if (this.wfInfo.module !== null) {
-                return this.wfInfo.module;
-            } else {
-                this.wfInfo.module = require(this.wfInfo.wf.workflow.modulePath);
-                return this.wfInfo.module;
-            }
-        } else {
-            return null;
-        }
-    }
-
     /**
      * Get the permissions applicable in a state as an array of permission objects
      * 
@@ -249,6 +236,13 @@ class Workflow {
             return null;
         }
     }
+
+    /**
+     * Gets the action module path
+     */
+    getActionModulePath() {
+        return this.wfInfo.wf.workflow.modulePath;
+    }
     
     /**
      * Calls a Pre/Post transit action, only the actionName is expected, and params can be passed.
@@ -256,8 +250,8 @@ class Workflow {
      * can be any arbitrary object passed by the caller. 
      * @param {*} transitName 
      */    
-    callModuleAction(actionName, params) {
-        const module = this.loadWorkflowModule();
+    callModuleAction(mPath, actionName, params) {
+        const module = require(mPath);
         if (module !== null) {
             if (module.hasOwnProperty(actionName)) {
                 // call the function with params
