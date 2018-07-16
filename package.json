@@ -1,6 +1,6 @@
 {
   "name": "gawati-workflow",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Finite State Machine Workflow library for Node JS",
   "main": "index.js",
   "directories": {
